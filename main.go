@@ -15,6 +15,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer services.Close()
 
 	// if we can form the services correctly, then go ahead
 	// and pass the service to the barcode controller.

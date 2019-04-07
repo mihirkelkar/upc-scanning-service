@@ -18,6 +18,7 @@ type Services struct {
 	  services related to all the models used here.
 	*/
 	ProductService ProductService
+	db             *redis.Client
 }
 
 //NewServices: Generates a new service that can be used by other
@@ -34,7 +35,7 @@ func NewServices() (*Services, error) {
 		return nil, prdSrvErr
 	}
 
-	return &Services{ProductService: prdService}, nil
+	return &Services{ProductService: prdService, db: redisClient}, nil
 
 }
 
@@ -53,4 +54,9 @@ func newRedisClient() (*redis.Client, error) {
 		return nil, errors.New("Error: Could not connect to Redis")
 	}
 	return client, nil
+}
+
+//Close : close connection to the redis client.
+func (s *Services) Close() error {
+	return s.db.Close()
 }

@@ -14,10 +14,23 @@ type Product struct {
 }
 
 func (p *Product) populateStruct(result []interface{}) {
+	//if the upc is not filled, then the result is assumed empty.
+	if result[1] == nil {
+		return
+	}
 	p.ProductName = result[0].(string)
 	p.Upc = result[1].(string)
 	p.SearchTerm = result[2].(string)
 	p.Catalog, _ = strconv.Atoi(result[3].(string))
+}
+
+//isEmpty : If the UPC field of a product is empty, the product is
+//assumed empty
+func (p *Product) isEmpty() bool {
+	if p.Upc == "" {
+		return true
+	}
+	return false
 }
 
 //ProductRedis : The Product Redis Interface is a
@@ -49,8 +62,13 @@ func (p *productDB) ByUpc(upc string) (*Product, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	prd := Product{}
 	prd.populateStruct(product)
+	if prd.isEmpty() {
+		//no response was returned from Redis.
+		return nil, nil
+	}
 	return &prd, nil
 }
 
