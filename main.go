@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-
+	//all of this should be separated out into a new file called app.go
 	r := mux.NewRouter()
 	services, err := models.NewServices()
 	if err != nil {
