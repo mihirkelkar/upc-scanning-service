@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -9,9 +10,16 @@ import (
 )
 
 func main() {
-	//all of this should be separated out into a new file called app.go
+	//define the command line arguments.
+	var redisConfig string
+	flag.StringVar(&redisConfig, "redisconfig", "redis.json", "")
+	flag.Parse()
+
+	config := NewConfig()
+	config.ReadConfigJson(redisConfig)
+
 	r := mux.NewRouter()
-	services, err := models.NewServices()
+	services, err := models.NewServices(config.ReturnConfig())
 	if err != nil {
 		panic(err)
 	}

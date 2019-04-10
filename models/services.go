@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/go-redis/redis"
 )
@@ -22,10 +23,10 @@ type Services struct {
 }
 
 //NewServices: Generates a new service that can be used by other
-//models.
-func NewServices() (*Services, error) {
+//models.Accepts a map of configurations for redis.
+func NewServices(config map[string]string) (*Services, error) {
 	//create a new redis client.
-	redisClient, err := newRedisClient()
+	redisClient, err := newRedisClient(config)
 	if err != nil {
 		return nil, err
 	}
@@ -39,13 +40,14 @@ func NewServices() (*Services, error) {
 
 }
 
-func newRedisClient() (*redis.Client, error) {
+func newRedisClient(config map[string]string) (*redis.Client, error) {
 	//TODO : Need to take this out into a config package
 	//set the config package from a command line in the main.go file
+	db, _ := strconv.Atoi(config["database"])
 	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Addr:     config["address"],
+		Password: config["password"], // no password set
+		DB:       db,                 // use default DB
 	})
 
 	//test the client. If something is amiss, return an error.
