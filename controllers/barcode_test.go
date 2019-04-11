@@ -69,7 +69,12 @@ func TestFetchBarcode(t *testing.T) {
 
 func TestMain(m *testing.M) {
 	//setup the testing here.
-	services, err := models.NewServices()
+	var configmap = make(map[string]string)
+	configmap["address"] = "localhost:6379"
+	configmap["password"] = ""
+	configmap["database"] = "0"
+
+	services, err := models.NewServices(configmap)
 	if err != nil {
 		os.Exit(1)
 	}
