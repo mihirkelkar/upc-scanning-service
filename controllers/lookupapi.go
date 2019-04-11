@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/mihirkelkar/bss-service/models"
@@ -82,6 +84,14 @@ type barcodeLookup struct{
 
 }
 
+func (b *barcodeLookup) loadApiResponse(resp io.ReadCloser) (*LookupApiResponse, error){
+  //this should load the api response body into a
+}
+
+func (b *barcodeLookup) convertToProduct(lApi *LookupApiResponse) (*models.Product, error){
+
+  //this should accept a full API and return a truncated smaller models.Product response
+}
 
 func (b *barcodeLookup) LookupBarcode(barcode string) (*models.Product, error) {
 	return &models.Product{}, nil
@@ -109,5 +119,22 @@ type thirdPartyAPI struct {
 }
 
 func (tp *thirdPartyAPI) queryAPI(barcode string) (*http.Response, error) {
-	return nil, nil
+	//make the full api url by formatting the barcode in the API
+	fullBarCodeURL := fmt.Sprintf(tp.apiurl, tp.apikey, barcode)
+	req, err := http.NewRequest("GET", fullBarCodeURL, nil)
+	if err != nil {
+		return nil, err
+	}
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if (resp.StatusCode == http.StatusNotFound) || (resp.StatusCode == http.StatusBadRequest) {
+		return nil, errors.New("No response could be found for this product")
+	}
+
+	return resp, err
 }

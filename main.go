@@ -12,14 +12,17 @@ import (
 func main() {
 	//define the command line arguments.
 	var redisConfig string
-	flag.StringVar(&redisConfig, "redisconfig", "redis.json", "")
+	var apiKey string
+	flag.StringVar(&redisConfig, "redisconfig", "redis.json", "Provide the JSON file that has the redis config")
+	flag.StringVar(&apiKey, "apikey", "", "Provide the third party API key for barcodeapi.com")
 	flag.Parse()
 
 	config := NewConfig()
-	config.ReadConfigJson(redisConfig)
+	config.ReadRedisJSON(redisConfig)
+	config.SetApiKey(apiKey)
 
 	r := mux.NewRouter()
-	services, err := models.NewServices(config.ReturnConfig())
+	services, err := models.NewServices(config.ReturnConfig(), config.GetApiKey())
 	if err != nil {
 		panic(err)
 	}
