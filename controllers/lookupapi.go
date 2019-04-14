@@ -1,8 +1,11 @@
 package controllers
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/mihirkelkar/bss-service/models"
@@ -79,20 +82,37 @@ type BarcodeLookup interface {
 	LookupDetailedBarcode(barcode string) (*LookupApiResponse, error)
 }
 
+type barcodeLookup struct{}
+
+func (b *barcodeLookup) loadAPIResponse(resp io.ReadCloser) (*LookupApiResponse, error) {
+	if resp == nil {
+		return nil, errors.New("Error: Invalid Response Body")
+	}
+	result, err := ioutil.ReadAll(resp)
+	if err != nil {
+		return nil, errors.New("Error: Response body cannot be read")
+	}
+	apiresp := LookupApiResponse{}
+	err = json.Unmarshal(result, &apiresp)
+	if err != nil {
+		return nil, errors.New("Error: Error Unmarshallling the Response")
+	}
+	return &apiresp, nil
+}
+
+func (b *barcodeLookup) convertToProduct(lApi *LookupApiResponse) (*models.Product, error) {
+	var product models.Product
+	if lApi == nil {
+		return nil, errors.New("Error: The lookup api response object was nil")
+	}
+	product.ProductName = lApi.Products[0].ProductName
+	product.Catalog = 0
+	product.SearchTerm = product.ProductName
+	product.Upc = lApi.Products[0].BarcodeNumber
+	return &product, nil
+}
+
 /*
-type barcodeLookup struct{
-
-}
-
-func (b *barcodeLookup) loadApiResponse(resp io.ReadCloser) (*LookupApiResponse, error){
-  //this should load the api response body into a
-}
-
-func (b *barcodeLookup) convertToProduct(lApi *LookupApiResponse) (*models.Product, error){
-
-  //this should accept a full API and return a truncated smaller models.Product response
-}
-
 func (b *barcodeLookup) LookupBarcode(barcode string) (*models.Product, error) {
 	return &models.Product{}, nil
 }
@@ -101,8 +121,8 @@ func (b *barcodeLookup) LookupDetailedBarcode(barcode string) (*LookupApiRespons
 	return &LookupApiResponse{}, nil
 }
 
-func NewBarcodeLookupApi() (BarcodeLookup, error) {
-	return &barcodeLookupAPI{}, nil
+func NewBarcodeLookup() (BarcodeLookup, error) {
+	return &barcodeLookup{}, nil
 }
 */
 
@@ -110,7 +130,7 @@ func NewBarcodeLookupApi() (BarcodeLookup, error) {
 //We can mock this when this interface when unittesting.
 //BarcodeLookup : interacts with the BarcodeLookup API
 type ThirdPartyAPI interface {
-	queryAPI(barcode string) (*http.Response, error)
+	queryAPI(barcode string) (io.Reader, error)
 }
 
 type thirdPartyAPI struct {
@@ -118,7 +138,7 @@ type thirdPartyAPI struct {
 	apiurl string
 }
 
-func (tp *thirdPartyAPI) queryAPI(barcode string) (*http.Response, error) {
+func (tp *thirdPartyAPI) queryAPI(barcode string) (io.Reader, error) {
 	//make the full api url by formatting the barcode in the API
 	fullBarCodeURL := fmt.Sprintf(tp.apiurl, tp.apikey, barcode)
 	req, err := http.NewRequest("GET", fullBarCodeURL, nil)
@@ -136,5 +156,5 @@ func (tp *thirdPartyAPI) queryAPI(barcode string) (*http.Response, error) {
 		return nil, errors.New("No response could be found for this product")
 	}
 
-	return resp, err
+	return resp.Body, err
 }

@@ -1,0 +1,54 @@
+{
+    "products": [
+        {
+            "barcode_number": "767719012051",
+            "barcode_type": "UPC",
+            "barcode_formats": "UPC 767719012051, EAN 0767719012051",
+            "mpn": "491307",
+            "model": "Beal",
+            "asin": "B003IMUYV2",
+            "product_name": "Beal Flyer II 10.2Mmx70M Dry Cover Rope",
+            "title": "",
+            "category": "Home & Garden > Lawn & Garden > Gardening > Gardening Tools > Bulb Planting Tools",
+            "manufacturer": "Beal",
+            "brand": "",
+            "label": "",
+            "author": "",
+            "publisher": "Beal",
+            "artist": "",
+            "actor": "",
+            "director": "",
+            "studio": "",
+            "genre": "",
+            "audience_rating": "",
+            "ingredients": "",
+            "nutrition_facts": "",
+            "color": "",
+            "format": "",
+            "package_quantity": "",
+            "size": "",
+            "length": "",
+            "width": "",
+            "height": "",
+            "weight": "",
+            "release_date": "",
+            "description": "",
+            "features": [],
+            "images": [
+                "https://images.barcodelookup.com/155/1558934-1.jpg",
+                "https://images.barcodelookup.com/155/1558934-2.jpg",
+                "https://images.barcodelookup.com/155/1558934-3.jpg"
+            ],
+            "stores": [
+                {
+                    "store_name": "Backcountry.com",
+                    "store_price": "269.95",
+                    "product_url": "http://www.backcountry.com/beal-flyer-ii-10.2mm-dry-cover-rope?CMP_SKU=BEA0006&MER=0406&utm_source=CJ&utm_source=Affiliate&mr:trackingCode=BBB262EF-8763-DF11-9DA0-002219319097&mr:referralID=NA",
+                    "currency_code": "USD",
+                    "currency_symbol": "$"
+                }
+            ],
+            "reviews": []
+        }
+    ]
+}
