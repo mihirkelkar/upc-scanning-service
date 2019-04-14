@@ -82,9 +82,11 @@ type BarcodeLookup interface {
 	LookupDetailedBarcode(barcode string) (*LookupApiResponse, error)
 }
 
-type barcodeLookup struct{}
+type barcodeLookup struct {
+	ThirdPartyAPI
+}
 
-func (b *barcodeLookup) loadAPIResponse(resp io.ReadCloser) (*LookupApiResponse, error) {
+func (b *barcodeLookup) loadAPIResponse(resp io.Reader) (*LookupApiResponse, error) {
 	if resp == nil {
 		return nil, errors.New("Error: Invalid Response Body")
 	}
@@ -112,16 +114,33 @@ func (b *barcodeLookup) convertToProduct(lApi *LookupApiResponse) (*models.Produ
 	return &product, nil
 }
 
-/*
+//LookupBarcode : This function takes in a barcode, calls the third party Api
+//interface to lookup the barcode in the third party service, convert the
+//response to a product response and then returns it to the upper controller
+// as a product that our service can consume.
 func (b *barcodeLookup) LookupBarcode(barcode string) (*models.Product, error) {
-	return &models.Product{}, nil
+	respBody, err := b.ThirdPartyAPI.queryAPI(barcode)
+	if err != nil {
+		return nil, err
+	}
+	detailPrd, err := b.loadAPIResponse(respBody)
+	if err != nil {
+		return nil, err
+	}
+	prd, err := b.convertToProduct(detailPrd)
+	if err != nil {
+		return nil, err
+	}
+	return prd, nil
 }
 
+/*
 func (b *barcodeLookup) LookupDetailedBarcode(barcode string) (*LookupApiResponse, error) {
 	return &LookupApiResponse{}, nil
 }
 
 func NewBarcodeLookup() (BarcodeLookup, error) {
+
 	return &barcodeLookup{}, nil
 }
 */

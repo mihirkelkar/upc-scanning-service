@@ -199,7 +199,7 @@ func TestMain(m *testing.M) {
 	//setup the testing here.
 	var configmap = make(map[string]string)
 	configmap["address"] = "localhost:6379"
-	configmap["password"] = ""
+	configmap["password"] = "***" //this is not the real password duh
 	configmap["database"] = "0"
 	var apikey string
 
