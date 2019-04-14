@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	"github.com/go-redis/redis"
@@ -20,11 +21,12 @@ type Services struct {
 	*/
 	ProductService ProductService
 	db             *redis.Client
+	ApiKey         string
 }
 
 //NewServices: Generates a new service that can be used by other
 //models.Accepts a map of configurations for redis.
-func NewServices(config map[string]string) (*Services, error) {
+func NewServices(config map[string]string, apikey string) (*Services, error) {
 	//create a new redis client.
 	redisClient, err := newRedisClient(config)
 	if err != nil {
@@ -36,7 +38,7 @@ func NewServices(config map[string]string) (*Services, error) {
 		return nil, prdSrvErr
 	}
 
-	return &Services{ProductService: prdService, db: redisClient}, nil
+	return &Services{ProductService: prdService, db: redisClient, ApiKey: apikey}, nil
 
 }
 
@@ -53,6 +55,7 @@ func newRedisClient(config map[string]string) (*redis.Client, error) {
 	//test the client. If something is amiss, return an error.
 	_, err := client.Ping().Result()
 	if err != nil {
+		fmt.Println(err)
 		return nil, errors.New("Error: Could not connect to Redis")
 	}
 	return client, nil

@@ -14,7 +14,7 @@ func main() {
 	var redisConfig string
 	var apiKey string
 	flag.StringVar(&redisConfig, "redisconfig", "redis.json", "Provide the JSON file that has the redis config")
-	flag.StringVar(&apiKey, "apikey", "", "Provide the third party API key for barcodeapi.com")
+	flag.StringVar(&apiKey, "apikey", "tre", "Provide the third party API key for barcodeapi.com")
 	flag.Parse()
 
 	config := NewConfig()

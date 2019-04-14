@@ -29,7 +29,7 @@ type thirdPartyAPIConfig struct {
 
 //NewConfig : Returns a new config object
 func NewConfig() *Config {
-	return &Config{}
+	return &Config{redisConfig: &redisConfig{}, apiConfig: &thirdPartyAPIConfig{}}
 }
 
 //ReadRedisJSON : reads a json file of configuration and stores it in a
@@ -52,7 +52,7 @@ func (c *Config) ReadRedisJSON(configname string) error {
 func (c *Config) ReturnConfig() map[string]string {
 	configmap := make(map[string]string)
 	configmap["address"] = c.redisConfig.address
-	configmap["password"] = c.redisConfig.address
+	configmap["password"] = c.redisConfig.password
 	configmap["database"] = strconv.Itoa(c.redisConfig.database)
 	return configmap
 }
