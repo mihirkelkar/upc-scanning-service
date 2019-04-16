@@ -21,24 +21,26 @@ type Services struct {
 	*/
 	ProductService ProductService
 	db             *redis.Client
-	ApiKey         string
 }
 
 //NewServices: Generates a new service that can be used by other
 //models.Accepts a map of configurations for redis.
-func NewServices(config map[string]string, apikey string) (*Services, error) {
+func NewServices(config map[string]string) (*Services, error) {
 	//create a new redis client.
 	redisClient, err := newRedisClient(config)
 	if err != nil {
 		return nil, err
 	}
-
-	prdService, prdSrvErr := NewProductService(redisClient)
+	brcdService, err := NewBarcodeLookup(config["apiurl"])
+	if err != nil {
+		return nil, err
+	}
+	prdService, prdSrvErr := NewProductService(redisClient, brcdService)
 	if prdSrvErr != nil {
 		return nil, prdSrvErr
 	}
 
-	return &Services{ProductService: prdService, db: redisClient, ApiKey: apikey}, nil
+	return &Services{ProductService: prdService, db: redisClient}, nil
 
 }
 

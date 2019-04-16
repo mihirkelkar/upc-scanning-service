@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"strconv"
 )
@@ -25,6 +26,7 @@ type redisConfig struct {
 //note that this is an unexported config structure with unexported fields.
 type thirdPartyAPIConfig struct {
 	apikey string
+	apiurl string
 }
 
 //NewConfig : Returns a new config object
@@ -45,6 +47,8 @@ func (c *Config) ReadRedisJSON(configname string) error {
 	c.redisConfig.address = vi["address"].(string)
 	c.redisConfig.password = vi["password"].(string)
 	c.redisConfig.database = int(vi["database"].(float64))
+	c.apiConfig.apikey = vi["apikey"].(string)
+	c.apiConfig.apiurl = vi["apiurl"].(string)
 	return nil
 }
 
@@ -54,13 +58,16 @@ func (c *Config) ReturnConfig() map[string]string {
 	configmap["address"] = c.redisConfig.address
 	configmap["password"] = c.redisConfig.password
 	configmap["database"] = strconv.Itoa(c.redisConfig.database)
+	configmap["apiurl"] = c.GetCompleteAPIURL()
 	return configmap
 }
 
-func (c *Config) SetApiKey(apikey string) {
-	c.apiConfig.apikey = apikey
+//GetAPIKey : Returns the API key
+func (c *Config) GetAPIKey() string {
+	return c.apiConfig.apikey
 }
 
-func (c *Config) GetApiKey() string {
-	return c.apiConfig.apikey
+//GetCompleteAPIURL : Returns the complete formatted API url
+func (c *Config) GetCompleteAPIURL() string {
+	return fmt.Sprintf(c.apiConfig.apiurl, c.GetAPIKey())
 }

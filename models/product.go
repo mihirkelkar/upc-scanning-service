@@ -84,15 +84,17 @@ func (p *productDB) ByUpc(upc string) (*Product, error) {
 
 type ProductService interface {
 	ProductDB
+	BarcodeLookup
 }
 
 type productService struct {
 	ProductDB
+	BarcodeLookup
 }
 
 //Creates a service for interacting with products in Redis.
-func NewProductService(redisClient *redis.Client) (ProductService, error) {
+func NewProductService(redisClient *redis.Client, barcodeService BarcodeLookup) (ProductService, error) {
 	prdRedis := &productDB{client: redisClient}
-	prdService := &productService{ProductDB: prdRedis}
+	prdService := &productService{ProductDB: prdRedis, BarcodeLookup: barcodeService}
 	return prdService, nil
 }

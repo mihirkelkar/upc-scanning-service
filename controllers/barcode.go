@@ -33,7 +33,7 @@ func (bs *BarcodeController) FetchBarcode(w http.ResponseWriter, r *http.Request
 	data, _ := bs.ps.ByUpc(upc)
 	//if data is empty, then render a 404 on the API
 	if data == nil {
-		http.NotFound(w, r)
+		data, _ = bs.ps.LookupBarcode(upc)
 	}
 	views.Render(w, r, data)
 }
