@@ -134,18 +134,17 @@ func (b *barcodeLookup) LookupBarcode(barcode string) (*models.Product, error) {
 	return prd, nil
 }
 
-/*
 func (b *barcodeLookup) LookupDetailedBarcode(barcode string) (*LookupApiResponse, error) {
 	return &LookupApiResponse{}, nil
 }
 
-func NewBarcodeLookup() (BarcodeLookup, error) {
-
-	return &barcodeLookup{}, nil
+//NewBarcodeLookup : wrapper function that can return a new barcode API service
+func NewBarcodeLookup(apikey string, apiurl string) (BarcodeLookup, error) {
+	tpa := NewThirdPartyAPI(apikey, apiurl)
+	return &barcodeLookup{ThirdPartyAPI: tpa}, nil
 }
-*/
 
-//This is the interface that will actually interact with the third party API
+//ThirdPartyAPI : This is the interface that will actually interact with the third party API
 //We can mock this when this interface when unittesting.
 //BarcodeLookup : interacts with the BarcodeLookup API
 type ThirdPartyAPI interface {
@@ -176,4 +175,12 @@ func (tp *thirdPartyAPI) queryAPI(barcode string) (io.Reader, error) {
 	}
 
 	return resp.Body, err
+}
+
+//NewThirdPartyAPI : return an object that can fit that interface.
+func NewThirdPartyAPI(apikey string, apiurl string) ThirdPartyAPI {
+	return &thirdPartyAPI{
+		apikey: apikey,
+		apiurl: apiurl,
+	}
 }
