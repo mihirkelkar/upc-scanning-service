@@ -71,10 +71,10 @@ func TestMain(m *testing.M) {
 	//setup the testing here.
 	var configmap = make(map[string]string)
 	configmap["address"] = "localhost:6379"
-	configmap["password"] = "test" //this is not the real password duh
+	configmap["password"] = "****" //this is not the real password duh
 	configmap["database"] = "0"
 	configmap["apiurl"] = "https://api.barcodelookup.com/v2/products?formatted=y&key=%s"
-	configmap["apikey"] = "c3pexii0rlb0qx035vjbkxp8avzrc2"
+	configmap["apikey"] = "****"
 
 	services, err := models.NewServices(configmap)
 	if err != nil {
