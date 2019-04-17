@@ -42,6 +42,7 @@ func (p *Product) isEmpty() bool {
 //When writing tests, do not test the actually connections with
 type ProductDB interface {
 	ByUpc(string) (*Product, error)
+	AddUpc(*Product) error
 }
 
 //This will be a client that eventually connects to Redis.
@@ -70,6 +71,27 @@ func (p *productDB) ByUpc(upc string) (*Product, error) {
 		return nil, nil
 	}
 	return &prd, nil
+}
+
+func (p *productDB) setFields(prd *Product) map[string]interface{} {
+	var fields map[string]interface{}
+	fields = make(map[string]interface{})
+	fields["upc"] = prd.Upc
+	fields["productname"] = prd.ProductName
+	fields["searchterm"] = prd.SearchTerm
+	fields["catalog"] = strconv.Itoa(prd.Catalog)
+	return fields
+}
+
+//AddUpc : Adds information from the third party service to our redis cache.
+func (p *productDB) AddUpc(prd *Product) error {
+	upc := p.buildKey(prd.Upc)
+	fields := p.setFields(prd)
+	_, err := p.client.HMSet(upc, fields).Result()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 //TODO : Write a productValidator struct that implements the ProductRedis
