@@ -29,6 +29,7 @@ func main() {
 	brCtrl := controllers.NewBarcodeController(services.ProductService)
 
 	r.HandleFunc("/barcode", brCtrl.FetchBarcode).Methods("GET")
+	r.HandleFunc("/barcode", brCtrl.AddBarcode).Methods("POST")
 
 	http.ListenAndServe(":3000", r)
 

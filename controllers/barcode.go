@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 
@@ -49,4 +51,24 @@ func (bs *BarcodeController) FetchBarcode(w http.ResponseWriter, r *http.Request
 	}
 
 	views.Render(w, r, data)
+}
+
+func (bs *BarcodeController) AddBarcode(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var product models.Product
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, http.StatusText(400), 400)
+		return
+	}
+	err = json.Unmarshal(body, &product)
+	if err != nil {
+		http.Error(w, http.StatusText(400), 400)
+	}
+	err = bs.ps.AddUpc(&product)
+	if err != nil {
+		http.Error(w, http.StatusText(500), 500)
+	}
+	w.WriteHeader(200)
 }

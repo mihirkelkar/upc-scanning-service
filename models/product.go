@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/go-redis/redis"
@@ -103,6 +104,50 @@ func (p *productDB) AddUpc(prd *Product) error {
 
 //ProductService : The ProductService interface can be exported to all other files.
 //as a single encapusulation
+type productValidator struct {
+	ProductDB
+}
+
+type prodValFn func(p *Product) error
+
+func RunProductValFns(p *Product, fns ...prodValFn) error {
+	for _, fn := range fns {
+		err := fn(p)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (pv *productValidator) HasProductName(p *Product) error {
+	if p.ProductName == "" {
+		return errors.New("Error : Product Name Required")
+	}
+	return nil
+}
+
+func (pv *productValidator) HasUpc(p *Product) error {
+	if p.Upc == "" {
+		return errors.New("Error: UPC Required")
+	}
+	return nil
+}
+
+func (pv *productValidator) HasSearchTerm(p *Product) error {
+	if p.SearchTerm == "" {
+		return errors.New("Error: Search Term Required")
+	}
+	return nil
+}
+
+func (pv *productValidator) AddUpc(p *Product) error {
+	err := RunProductValFns(p, pv.HasProductName, pv.HasSearchTerm, pv.HasUpc)
+	if err != nil {
+		return err
+	}
+	return pv.ProductDB.AddUpc(p)
+}
 
 type ProductService interface {
 	ProductDB
@@ -117,6 +162,7 @@ type productService struct {
 //Creates a service for interacting with products in Redis.
 func NewProductService(redisClient *redis.Client, barcodeService BarcodeLookup) (ProductService, error) {
 	prdRedis := &productDB{client: redisClient}
-	prdService := &productService{ProductDB: prdRedis, BarcodeLookup: barcodeService}
+	prdValidator := &productValidator{ProductDB: prdRedis}
+	prdService := &productService{ProductDB: prdValidator, BarcodeLookup: barcodeService}
 	return prdService, nil
 }
